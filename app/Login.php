@@ -51,7 +51,7 @@ function Login()
                 $mail->setFrom($configuration->email_config->from);
                 $mail->addAddress($configuration->email_config->to);
                 $mail->Subject = $configuration->email_config->subject;
-                $mail->Body = "A TAN is required";
+                $mail->Body = "A TAN is required for " . $filename;
 
                 if (!$mail->send()) {
                     echo 'Mailer Error: ' . $mail->ErrorInfo;
