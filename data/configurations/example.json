@@ -17,7 +17,7 @@
     "bank_account_iban": "",
     "firefly_account_id": "",
     "__from_to_comment__": "The following values will be passed directly into DateTime. Set them to null to choose them manually during import process.",
-    "from": "now - 7 days",
+    "from": "last",
     "to": "now"
   },
   "__nonce_comment__": "Encryption nonce. If set, bank_password is assumed to be encrypted with. Generate data with generate GET parameter. Key to be passed as key GET parameter",
