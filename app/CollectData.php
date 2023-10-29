@@ -9,7 +9,7 @@ use Symfony\Component\HttpFoundation\Session\Session;
 
 function CollectData()
 {
-    global $request, $session, $twig, $automate_without_js, $encryption_key;
+    global $request, $session, $twig, $automate_without_js, $encryption_key, $apcuAvailable;
 
     if($request->request->get('data_collect_mode') == "createNewDataset"){
         echo $twig->render(
@@ -26,27 +26,29 @@ function CollectData()
         if ($request->request->has('bank_username')) {
             $configuration->bank_username = $request->request->get('bank_username');
         } 
+        
+        $password = $configuration->bank_password; 
         if ($request->request->has('bank_password')) {
-            $configuration->bank_password = $request->request->get('bank_password');
+            $password = $request->request->get('bank_password');
         }      
 
         if (!empty($configuration->nonce)) {
             if($request->request->has('key') && !empty($request->request->get('key'))) {
                 $key = hex2bin($request->request->get('key'));
                 $nonce = hex2bin($configuration->nonce);
-                $encrypted_pwd = hex2bin($configuration->bank_password);
+                $encrypted_pwd = hex2bin($password);
                 
-                $configuration->bank_password = sodium_crypto_aead_xchacha20poly1305_ietf_decrypt($encrypted_pwd, '', $nonce, $key);
+                $password = sodium_crypto_aead_xchacha20poly1305_ietf_decrypt($encrypted_pwd, '', $nonce, $key);
             } else {
                 if ($request->request->has('bank_password')) {
-                    $configuration->bank_password = $request->request->get('bank_password');
+                    $password = $request->request->get('bank_password');
                 } else {
-                    $configuration->bank_password = "";
+                    $password = "";
                 }           
             }
        }
         
-        if ($configuration->bank_username == "" || $configuration->bank_password == "") {
+        if ($configuration->bank_username == "" || $password == "") {
             echo $twig->render(
                 'collecting-data.twig',
                 array(
@@ -58,7 +60,11 @@ function CollectData()
         }
             
         $session->set('bank_username',           $configuration->bank_username);
-        $session->set('bank_password',           $configuration->bank_password);
+        if ($apcuAvailable) {
+            apcu_store('bank_password',          $password);    
+        } else {
+            $session->set('bank_password',       $password);
+        }       
         $session->set('bank_url',                $configuration->bank_url);
         $session->set('bank_code',               $configuration->bank_code);
         $session->set('bank_2fa',                $configuration->bank_2fa);

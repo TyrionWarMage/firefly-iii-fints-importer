@@ -26,6 +26,7 @@ use Symfony\Component\HttpFoundation\Session\Session;
 use App\Step;
 use GrumpyDictator\FFIIIApiSupport\Request\GetAccountsRequest;
 
+
 $loader = new \Twig\Loader\FilesystemLoader(__DIR__ . '/public/html');
 $twig   = new \Twig\Environment($loader);
 $automate_without_js = false;
@@ -37,6 +38,8 @@ if (isset($_GET['generate'])) {
 } else {
     $current_step = new Step($request->request->get("step", Step::STEP0_SETUP));
 }
+
+$apcuAvailable = function_exists('apcu_enabled') && apcu_enabled();
 
 $session = new Session();
 $session->start();
