@@ -40,7 +40,7 @@ if (isset($_GET['generate'])) {
 }
 
 $apcuAvailable = function_exists('apcu_enabled') && apcu_enabled();
-
+xdebug_break();
 $session = new Session();
 $session->start();
 
@@ -92,6 +92,10 @@ do
             
         default:
             $current_step = Step::DONE;
+            if ($apcuAvailable) {
+                apcu_clear_cache();
+            }
+            session_destroy();
             break;
     }
 } while ($current_step != Step::DONE);
