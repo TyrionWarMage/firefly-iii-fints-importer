@@ -117,9 +117,5 @@ function RunImportBatched()
     } else {
         $result = RunImportWithJS();
     }
-    if ($apcuAvailable) {
-        apcu_clear_cache();
-    }
-    session_destroy();
     return $result;
 }
