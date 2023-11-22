@@ -73,6 +73,7 @@ do
 
         default:
             $current_step = Step::DONE;
+            session_destroy();
             break;
     }
 } while ($current_step != Step::DONE);
