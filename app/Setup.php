@@ -2,10 +2,11 @@
 namespace App\StepFunction;
 
 use App\Step;
+use App\PasswordStorage;
 
 function Setup()
 {
-    global $twig, $automate_without_js, $request, $apcuAvailable;
+    global $twig, $automate_without_js, $request;
 
     $requested_config_file = '';
     $key = null;
@@ -15,7 +16,7 @@ function Setup()
     } 
    
     $warning = "";
-    if (!$apcuAvailable) {
+    if (!PasswordStorage::apcuAvailable()) {
         $warning = "Warning: Your password will stored locally under " . session_save_path() . " install APCu to prevent this.";
     } else {
         apcu_clear_cache();
