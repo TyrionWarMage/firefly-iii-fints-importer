@@ -3,6 +3,7 @@ namespace App\StepFunction;
 
 use App\TransactionsToFireflySender;
 use App\Step;
+use App\FinTsFactory;
 use Symfony\Component\HttpFoundation\Session\Session;
 
 $num_transactions_to_import_at_once = 5;
@@ -47,12 +48,19 @@ function RunImportWithJS()
     $transactions                = unserialize($session->get('transactions_to_import'));
     $num_transactions_processed  = $session->get('num_transactions_processed');
     $import_messages             = unserialize($session->get('import_messages'));
+    
+    $fin_ts = FinTsFactory::create_from_session($session);
+    $persistanceString = $this->finTs->persist(true);
+    $persistanceString = gzdeflate($persistanceString,  9);
+    $persistanceString = base64_encode($persistanceString);
+    
     if ($num_transactions_processed >= count($transactions)) {
         echo $twig->render(
             'done.twig',
             array(
                 'import_messages' => $import_messages,
-                'total_num_transactions' => count($transactions)
+                'total_num_transactions' => count($transactions),
+                'persistanceString' => $persistanceString
             )
         );
         $session->invalidate();
