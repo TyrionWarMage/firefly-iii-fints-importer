@@ -49,8 +49,7 @@ function RunImportWithJS()
     $num_transactions_processed  = $session->get('num_transactions_processed');
     $import_messages             = unserialize($session->get('import_messages'));
     
-    $fin_ts = FinTsFactory::create_from_session($session);
-    $persistanceString = $this->finTs->persist(true);
+    $persistanceString = $session->get('persistedFints');
     $persistanceString = gzdeflate($persistanceString,  9);
     $persistanceString = base64_encode($persistanceString);
     
