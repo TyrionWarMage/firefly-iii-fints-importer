@@ -69,7 +69,7 @@ function CollectData()
             $session->set('bank_2fa_device',         $configuration->bank_2fa_device);
         }
         if($configuration->persistanceString) {
-            $session->set('persistedFints');
+            $session->set('persistedFints',     $configuration->persistanceString);
         }
         $session->set('firefly_url',             $configuration->firefly_url);
         $session->set('firefly_access_token',    $configuration->firefly_access_token);
