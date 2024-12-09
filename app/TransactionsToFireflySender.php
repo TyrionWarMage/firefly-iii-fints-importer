@@ -52,6 +52,7 @@ class TransactionsToFireflySender
         string $regex_match, string $regex_replace
     )
     {
+        echo $transaction;
         $debitOrCredit = $transaction->getCreditDebit();
         $amount        = $transaction->getAmount();
         $source        = array('id' => $firefly_account_id);
