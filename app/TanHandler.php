@@ -53,7 +53,7 @@ class TanHandler
         return $this->action->needsTan();
     }
 
-    public function pose_and_render_tan_challenge(): void
+    public function pose_and_render_tan_challenge($automate_without_js = False): void
     {
         assert($this->needs_tan());
         $tanRequest = $this->action->getTanRequest();
@@ -68,19 +68,25 @@ class TanHandler
             } catch (\RuntimeException $e) {
                 $challengeImageSrc = null;
             }
-        }else{
+        } else {
             $challengeImageSrc = null;
         }
-        echo $this->twig->render(
-            'tan-challenge.twig',
-            array(
-                'next_step' => $this->current_step,
-                'challenge' => $tanRequest->getChallenge(),
-                'device' => $tanRequest->getTanMediumName(),
-                'challenge_image_src' => $challengeImageSrc,
-                'is_decoupled_tan_mode' => $this->fin_ts->getSelectedTanMode()->isDecoupled(),
-            )
-        );
+        echo "Automate" . ($automate_without_js ? 'true' : 'false');
+        echo "Decoupled" . ($this->fin_ts->getSelectedTanMode()->isDecoupled() ? 'true' : 'false');
+        if ($automate_without_js && $this->fin_ts->getSelectedTanMode()->isDecoupled()) {
+            sleep(60);    
+        } else {
+            echo $this->twig->render(
+                'tan-challenge.twig',
+                array(
+                    'next_step' => $this->current_step,
+                    'challenge' => $tanRequest->getChallenge(),
+                    'device' => $tanRequest->getTanMediumName(),
+                    'challenge_image_src' => $challengeImageSrc,
+                    'is_decoupled_tan_mode' => $this->fin_ts->getSelectedTanMode()->isDecoupled(),
+                )
+            );
+        }
         $this->session->set($this->action_id, serialize($this->action));
     }
 

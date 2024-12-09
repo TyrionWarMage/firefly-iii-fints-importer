@@ -39,7 +39,7 @@ function GetImportData()
         $request
     );
     if ($soa_handler->needs_tan()) {
-        $soa_handler->pose_and_render_tan_challenge();
+        $soa_handler->pose_and_render_tan_challenge($automate_without_js);
     } else {
         $next_step = Step::STEP5_RUN_IMPORT_BATCHED;
 

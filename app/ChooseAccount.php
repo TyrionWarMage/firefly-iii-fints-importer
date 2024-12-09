@@ -31,7 +31,7 @@ function ChooseAccount()
         $request
     );
     if ($list_accounts_handler->needs_tan()) {
-        $list_accounts_handler->pose_and_render_tan_challenge();
+        $list_accounts_handler->pose_and_render_tan_challenge($automate_without_js);
     } else {
         $bank_accounts            = $list_accounts_handler->get_finished_action()->getAccounts();
         $firefly_accounts_request = new GetAccountsRequest($session->get('firefly_url'), $session->get('firefly_access_token'));

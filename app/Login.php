@@ -13,6 +13,7 @@ use PHPMailer\PHPMailer\SMTP;
 function Login()
 {
     global $request, $session, $twig, $fin_ts, $automate_without_js;
+    echo "Automate0" . ($automate_without_js ? 'true' : 'false');
 
     if ($request->request->has('bank_2fa_device')) {
         $session->set('bank_2fa_device', $request->request->get('bank_2fa_device'));
@@ -34,8 +35,11 @@ function Login()
     );
 
     if ($login_handler->needs_tan()) {
-        if ($automate_without_js)
-        {
+        
+        $is_decoupled = $fin_ts->getSelectedTanMode()->isDecoupled();
+        
+        if ($automate_without_js && !$is_decoupled) {
+        
             $filename = $request->request->get('data_collect_mode');
             $configuration = ConfigurationFactory::load_from_file($filename);
             if ($configuration->email_config->enabled) {
@@ -58,7 +62,7 @@ function Login()
                 }
             }
         } else {
-            $login_handler->pose_and_render_tan_challenge();
+            $login_handler->pose_and_render_tan_challenge($automate_without_js);
         }
     } else {
         if ($automate_without_js)
