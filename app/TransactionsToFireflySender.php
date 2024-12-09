@@ -51,11 +51,7 @@ class TransactionsToFireflySender
         GetAccountsResponse $firefly_accounts,
         string $regex_match, string $regex_replace
     )
-    {
-        echo $transaction->getMainDescription();
-        echo $transaction->getBookingText();
-        echo $transaction->getDescription1();
-        
+    {        
         $debitOrCredit = $transaction->getCreditDebit();
         $amount        = $transaction->getAmount();
         $source        = array('id' => $firefly_account_id);
@@ -120,7 +116,7 @@ class TransactionsToFireflySender
                     'destination_id' => $destination['id'] ?? null,
                     'destination_iban' => $destination['iban'] ?? null,
                     'sepa_ct_id' => $transaction->getEndToEndID() ?? null,
-                    'notes' => $transaction->getStructuredDescription()['ABWA'] ?? null,
+                    'notes' => $transaction->getStructuredDescription()['ABWA'] ?? $transaction->getStructuredDescription()['SVWZ'] ?? null,
                 )
             )
         );
