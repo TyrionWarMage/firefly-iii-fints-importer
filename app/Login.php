@@ -10,16 +10,41 @@ use Symfony\Component\HttpFoundation\Session\Session;
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
 
+function mail_notify($request, $is_decoupled) {
+    $filename = $request->request->get('data_collect_mode');
+    $configuration = ConfigurationFactory::load_from_file($filename);
+    if ($configuration->email_config->enabled) {
+        $mail = new PHPMailer();
+        $mail->isSMTP();
+        $mail->SMTPDebug = SMTP::DEBUG_SERVER;
+        $mail->Host = $configuration->email_config->host;
+        $mail->Port = $configuration->email_config->port;
+        $mail->SMTPSecure = $configuration->email_config->smtp_secure;
+        $mail->SMTPAuth = true;
+        $mail->Username = $configuration->email_config->username;
+        $mail->Password = $configuration->email_config->password;
+        $mail->setFrom($configuration->email_config->from);
+        $mail->addAddress($configuration->email_config->to);
+        $mail->Subject = $configuration->email_config->subject;
+        $mail->Body = $is_decoupled ? "Decoupled 2FA verification is required for " . $filename : "A TAN is required for " . $filename;
+        
+        if (!$mail->send()) {
+            echo 'Mailer Error: ' . $mail->ErrorInfo;
+        }
+    }
+}
+
 function Login()
 {
-    global $request, $session, $twig, $fin_ts, $automate_without_js;
-    
+    global $request, $session, $twig, $fin_ts, $automate_without_js, $first_try;
+      
     if ($request->request->has('bank_2fa_device')) {
         $session->set('bank_2fa_device', $request->request->get('bank_2fa_device'));
     }
     $fin_ts = FinTsFactory::create_from_session($session);
 
     $current_step  = new Step($request->request->get("step", Step::STEP0_SETUP));
+
     $login_handler = new TanHandler(
         function () {
             global $fin_ts;
@@ -37,32 +62,12 @@ function Login()
         
         $is_decoupled = $fin_ts->getSelectedTanMode()->isDecoupled();
         
-        if ($automate_without_js && !$is_decoupled) {
-        
-            $filename = $request->request->get('data_collect_mode');
-            $configuration = ConfigurationFactory::load_from_file($filename);
-            if ($configuration->email_config->enabled) {
-                $mail = new PHPMailer();
-                $mail->isSMTP();
-                $mail->SMTPDebug = SMTP::DEBUG_SERVER;
-                $mail->Host = $configuration->email_config->host;
-                $mail->Port = $configuration->email_config->port;
-                $mail->SMTPSecure = $configuration->email_config->smtp_secure;
-                $mail->SMTPAuth = true;
-                $mail->Username = $configuration->email_config->username;
-                $mail->Password = $configuration->email_config->password;
-                $mail->setFrom($configuration->email_config->from);
-                $mail->addAddress($configuration->email_config->to);
-                $mail->Subject = $configuration->email_config->subject;
-                $mail->Body = "A TAN is required for " . $filename;
-
-                if (!$mail->send()) {
-                    echo 'Mailer Error: ' . $mail->ErrorInfo;
-                }
-            }
+        if ($automate_without_js && (!$is_decoupled || !$first_try)) {    
+            mail_notify($request, $is_decoupled);
         } else {
             $login_handler->pose_and_render_tan_challenge($automate_without_js);
             if ($automate_without_js) {
+                $first_try = False;
                 return Step::STEP2_LOGIN;
             }
         }

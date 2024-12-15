@@ -48,8 +48,7 @@ if (isset($_GET['automate'])) {
     $automate_without_js = $_GET['automate'] == "true";
 }
 
-
-
+$first_try = true;
 
 do
 {
