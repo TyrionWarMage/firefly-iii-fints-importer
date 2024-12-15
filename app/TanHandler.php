@@ -71,10 +71,9 @@ class TanHandler
         } else {
             $challengeImageSrc = null;
         }
-        echo "Automate" . ($automate_without_js ? 'true' : 'false');
-        echo "Decoupled" . ($this->fin_ts->getSelectedTanMode()->isDecoupled() ? 'true' : 'false');
+
         if ($automate_without_js && $this->fin_ts->getSelectedTanMode()->isDecoupled()) {
-            sleep(60);    
+            sleep(30);    
         } else {
             echo $this->twig->render(
                 'tan-challenge.twig',

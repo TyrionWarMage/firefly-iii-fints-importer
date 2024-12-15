@@ -13,8 +13,7 @@ use PHPMailer\PHPMailer\SMTP;
 function Login()
 {
     global $request, $session, $twig, $fin_ts, $automate_without_js;
-    echo "Automate0" . ($automate_without_js ? 'true' : 'false');
-
+    
     if ($request->request->has('bank_2fa_device')) {
         $session->set('bank_2fa_device', $request->request->get('bank_2fa_device'));
     }
@@ -63,6 +62,9 @@ function Login()
             }
         } else {
             $login_handler->pose_and_render_tan_challenge($automate_without_js);
+            if ($automate_without_js) {
+                return Step::STEP2_LOGIN;
+            }
         }
     } else {
         if ($automate_without_js)
