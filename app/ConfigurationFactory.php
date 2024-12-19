@@ -13,6 +13,7 @@ class EmailConfig {
     public $from;
     public $to;
     public $subject;
+    public $decoupled;
 }
 
 class Configuration {
@@ -33,6 +34,7 @@ class Configuration {
     public $description_regex_replace;
     public $nonce;
     public $email_config;
+    public $decoupled_2fa_timeout;
 }
 
 class ConfigurationFactory
@@ -78,12 +80,14 @@ class ConfigurationFactory
             $email_config->from        = $contentArray["tan_required_email_notification"]["from"];
             $email_config->to          = $contentArray["tan_required_email_notification"]["to"];
             $email_config->subject     = $contentArray["tan_required_email_notification"]["subject"];
+            $email_config->decoupled   = $contentArray["tan_required_email_notification"]["decoupled"] ?? true;
             $email_config->enabled = !empty($email_config->host) && !empty($email_config->port) &&
             !empty($email_config->smtp_secure) && !empty($email_config->username) &&
             !empty($email_config->password) && !empty($email_config->from) &&
             !empty($email_config->to) && !empty($email_config->subject);
         }
         $configuration->email_config = $email_config;
+        $configuration->decoupled_2fa_timeout = $contentArray["decoupled_2fa_timeout"] ?? 30;
         
         return $configuration;
     }

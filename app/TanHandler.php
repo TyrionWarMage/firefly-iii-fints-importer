@@ -73,7 +73,10 @@ class TanHandler
         }
 
         if ($automate_without_js && $this->fin_ts->getSelectedTanMode()->isDecoupled()) {
-            sleep(30);    
+            global $request;
+            $filename = $request->request->get('data_collect_mode');
+            $configuration = ConfigurationFactory::load_from_file($filename);
+            sleep($configuration->decoupled_2fa_timeout);    
         } else {
             echo $this->twig->render(
                 'tan-challenge.twig',

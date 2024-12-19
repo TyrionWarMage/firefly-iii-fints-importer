@@ -13,7 +13,7 @@ use PHPMailer\PHPMailer\SMTP;
 function mail_notify($request, $is_decoupled) {
     $filename = $request->request->get('data_collect_mode');
     $configuration = ConfigurationFactory::load_from_file($filename);
-    if ($configuration->email_config->enabled) {
+    if ($configuration->email_config->enabled && (!$is_decoupled || $configuration->email_config->decoupled)) {
         $mail = new PHPMailer();
         $mail->isSMTP();
         $mail->SMTPDebug = SMTP::DEBUG_SERVER;
