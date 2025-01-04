@@ -87,7 +87,7 @@ class ConfigurationFactory
             !empty($email_config->to) && !empty($email_config->subject);
         }
         $configuration->email_config = $email_config;
-        $configuration->decoupled_2fa_timeout = $contentArray["decoupled_2fa_timeout"] ?? 60;
+        $configuration->decoupled_2fa_timeout = $contentArray["decoupled_2fa_timeout"] ?? 45;
         
         return $configuration;
     }
