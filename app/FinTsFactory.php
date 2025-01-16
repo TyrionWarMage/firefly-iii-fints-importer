@@ -28,9 +28,14 @@ class FinTsFactory
         assert($password, "Password missing");
         
         $credentials = Credentials::create($session->get('bank_username'), $password);
-        
-        $finTs = FinTs::new($options, $credentials);
-        
+        $fints_persistence = $session->get('fints_persistence');
+
+        if ($fints_persistence) {
+            $finTs = FinTs::new($options, $credentials, $fints_persistence);
+        } else {
+            $finTs = FinTs::new($options, $credentials);
+        }
+
         $tanMode = self::get_tan_mode($finTs, $session);
 
         if ($tanMode->needsTanMedium() and $session->has('bank_2fa_device')) {
